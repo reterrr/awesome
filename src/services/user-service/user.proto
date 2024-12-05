@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "src/services/user-service;user";
+
+import "google/protobuf/any.proto";
+
+// Generic structure for API responses
+message ApiResponse {
+  int32 status_code = 1;  // HTTP-like status code (e.g., 200, 400, 500)
+  string message = 2;     // Human-readable status message
+  google.protobuf.Any data = 3; // Optional additional data (e.g., User, List of Users)
+}
+
+// The user message structure
+message User {
+  string id = 1;            // Unique identifier for the user
+  string name = 2;          // Name of the user
+  string email = 3;         // Email of the user
+  string password = 4;      // Password (store securely, hash in the backend)
+  string created_at = 5;    // Creation timestamp
+  string updated_at = 6;    // Update timestamp
+}
+
+// Request for Create operation
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+// Request for Read (GetUser)
+message GetUserRequest {
+  string id = 1;  // ID of the user to retrieve
+}
+
+// Request for Update operation
+message UpdateUserRequest {
+  string id = 1;          // ID of the user to update
+  string name = 2;        // New name (optional)
+  string email = 3;       // New email (optional)
+  string password = 4;    // New password (optional)
+}
+
+// Request for Delete operation
+message DeleteUserRequest {
+  string id = 1;  // ID of the user to delete
+}
+
+// Service definition for User CRUD operations
+service UserService {
+  // Create a new user
+  rpc CreateUser(CreateUserRequest) returns (ApiResponse);
+
+  // Get user details by ID
+  rpc GetUser(GetUserRequest) returns (ApiResponse);
+
+  // Update user information
+  rpc UpdateUser(UpdateUserRequest) returns (ApiResponse);
+
+  // Delete a user by ID
+  rpc DeleteUser(DeleteUserRequest) returns (ApiResponse);
+}
+  

@@ -1,0 +1,64 @@
+version: "3.18"
+
+services:
+  postgres:
+
+  mongodb:
+
+  redis:
+    container_name: redis-awesome
+    image: redis:latest
+    environment:
+      -
+    ports:
+      - "6379:6379"
+
+  user-service:
+    container_name: user_service-awesome
+    build:
+      context: src/services/user-service
+      dockerfile: Dockerfile
+    image: user-service-awesome
+    ports:
+      - "8001:8000"
+    depends_on:
+      - postgres
+    networks:
+      - awesome
+
+  gateway-service:
+    container_name: gateway_service-awesome
+    build:
+      context: src/services/gateway-service
+      dockerfile: Dockerfile
+    image: gateway-service-awesome
+    ports:
+      - "8000:8000"
+    networks:
+      - awesome
+
+  weather-service:
+    container_name: weather_service-awesome
+    build:
+      context: src/services/weather-service
+      dockerfile: Dockerfile
+    image: weather-service-awesome
+    ports:
+      - "8002:8000"
+    networks:
+      - awesome
+
+  notification-service:
+    container_name: notification_service-awesome
+    build:
+      context: src/services/notification-service
+      dockerfile: Dockerfile
+    image: notification-service-awesome
+    ports:
+      - "8003:8000"
+    networks:
+      - awesome
+
+networks:
+  awesome:
+    driver: bridge
