@@ -4,6 +4,7 @@ go 1.22.10
 
 require (
 	awesome/src/services/common v0.0.0-00010101000000-000000000000
+	github.com/lib/pq v1.10.9
 	google.golang.org/grpc v1.68.1
 	google.golang.org/protobuf v1.34.2
 

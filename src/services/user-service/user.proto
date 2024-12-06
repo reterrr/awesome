@@ -20,7 +20,6 @@ message User {
   string email = 3;         // Email of the user
   string password = 4;      // Password (store securely, hash in the backend)
   string created_at = 5;    // Creation timestamp
-  string updated_at = 6;    // Update timestamp
 }
 
 // Request for Create operation
@@ -32,23 +31,15 @@ message CreateUserRequest {
 
 // Request for Read (GetUser)
 message GetUserRequest {
-  string id = 1;  // ID of the user to retrieve
+  string token = 1;  // ID of the user to retrieve
 }
 
-// Request for Update operation
-message UpdateUserRequest {
-  string id = 1;          // ID of the user to update
-  string name = 2;        // New name (optional)
-  string email = 3;       // New email (optional)
-  string password = 4;    // New password (optional)
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
 }
 
-// Request for Delete operation
-message DeleteUserRequest {
-  string id = 1;  // ID of the user to delete
-}
-
-// Service definition for User CRUD operations
+// Service definition for User CR operations
 service UserService {
   // Create a new user
   rpc CreateUser(CreateUserRequest) returns (ApiResponse);
@@ -56,10 +47,6 @@ service UserService {
   // Get user details by ID
   rpc GetUser(GetUserRequest) returns (ApiResponse);
 
-  // Update user information
-  rpc UpdateUser(UpdateUserRequest) returns (ApiResponse);
-
-  // Delete a user by ID
-  rpc DeleteUser(DeleteUserRequest) returns (ApiResponse);
+  rpc LoginUser(LoginUserRequest) returns (ApiResponse);
 }
   
