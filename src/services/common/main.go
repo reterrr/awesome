@@ -1,18 +1,25 @@
 package common
 
-type Config interface{}
-
-type App struct{}
+type App interface{}
 
 type Service struct {
-	config *Config
-	app    *App
+	Config *Config
+	App    *App
 }
 
-func (s Service) Initialize(config *Config, app *App) {
+var port string
+
+func NewService(config *Config, app *App) *Service {
+	return &Service{
+		Config: config,
+		App:    app,
+	}
+}
+
+func buildConnectionString() string {
 
 }
 
-func (s Service) Run() {
+func (s *Service) Run() {
 
 }

@@ -2,8 +2,19 @@ version: "3.18"
 
 services:
   postgres:
+    container_name: postgres-awesome
+    image: postgres:latest
+    ports:
+      - "5324:5234"
+    expose:
+      - 5325
 
   mongodb:
+    container_name: mongo-awesome
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+
 
   redis:
     container_name: redis-awesome
@@ -18,7 +29,7 @@ services:
     build:
       context: src/services/user-service
       dockerfile: Dockerfile
-    image: user-service-awesome
+    image: awesome/user-service
     ports:
       - "8001:8000"
     depends_on:
@@ -31,7 +42,7 @@ services:
     build:
       context: src/services/gateway-service
       dockerfile: Dockerfile
-    image: gateway-service-awesome
+    image: awesome/gateway-service
     ports:
       - "8000:8000"
     networks:
@@ -42,18 +53,30 @@ services:
     build:
       context: src/services/weather-service
       dockerfile: Dockerfile
-    image: weather-service-awesome
+    image: awesome/weather-service
     ports:
       - "8002:8000"
     networks:
       - awesome
+
+  location-service:
+    container_name: location_service-awesome
+    build:
+      context: src/services/location-service
+      dockerfile: Dockerfile
+    image: awesome/location-service
+    ports:
+      - "8004:8000"
+    networks:
+      - awesome
+
 
   notification-service:
     container_name: notification_service-awesome
     build:
       context: src/services/notification-service
       dockerfile: Dockerfile
-    image: notification-service-awesome
+    image: awesome/notification-service
     ports:
       - "8003:8000"
     networks:

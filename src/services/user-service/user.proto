@@ -27,6 +27,7 @@ message CreateUserRequest {
   string name = 1;
   string email = 2;
   string password = 3;
+  string checkPassword = 4;
 }
 
 // Request for Read (GetUser)
