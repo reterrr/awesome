@@ -1,0 +1,16 @@
+services:
+  user:
+
+  location:
+
+  weather:
+
+  user-location:
+
+  api-gateway:
+
+
+networks:
+  awesome:
+    driver: bridge
+
