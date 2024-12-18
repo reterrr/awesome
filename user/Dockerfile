@@ -1,7 +1,7 @@
 FROM maven:latest as build
 WORKDIR /app
-COPY pom.xml ./
-COPY src ./src
+COPY pom.xml .
+COPY src .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:latest

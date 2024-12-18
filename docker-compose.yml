@@ -1,14 +1,40 @@
 services:
   user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    networks:
+      - awesome
 
   location:
+    build:
+      context: ./location
+      dockerfile: Dockerfile
+    networks:
+      - awesome
 
   weather:
+    build:
+      context: ./weather
+      dockerfile: Dockerfile
+    networks:
+      - awesome
 
   user-location:
+    build:
+      context: ./user-location
+      dockerfile: Dockerfile
+    networks:
+      - awesome
 
   api-gateway:
-
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8080"
+    networks:
+      - awesome
 
 networks:
   awesome:
