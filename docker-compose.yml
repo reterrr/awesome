@@ -4,7 +4,9 @@ services:
       context: ./user
       dockerfile: Dockerfile
     networks:
-      - awesome
+      - user-postgres
+    depends_on:
+      - postgres
 
   location:
     build:
@@ -36,7 +38,25 @@ services:
     networks:
       - awesome
 
+  postgres:
+    image: postgres
+    container_name: "postgresql"
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+    volumes:
+      - user_service:/var/lib/postgresql/data
+    networks:
+      - user-postgres
+
+volumes:
+  user_service:
+
 networks:
+  user-postgres:
+    driver: bridge
   awesome:
     driver: bridge
 
