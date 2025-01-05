@@ -12,14 +12,13 @@ public class UserController
 
     }
 
-    @GetMapping("/locations/search")
-    public void locationsSearch(@RequestParam String query) {
-
-    }
-
     @DeleteMapping("/locations/{id}")
     public void unpinLocation(@PathVariable String id) {
 
     }
 
+    @DeleteMapping("/")
+    public void deleteUser() {
+
+    }
 }

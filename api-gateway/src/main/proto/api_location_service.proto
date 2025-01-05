@@ -1,0 +1,39 @@
+syntax = "proto3";
+package com.example.generated;
+option java_multiple_files = true;
+
+import "api_user_service.proto";
+
+
+message Location {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message LocationResponse {
+ Location location = 1;
+}
+
+message SearchLocationRequest {
+  uint64 user_id = 1;
+  string pattern = 2;
+}
+
+message GetLocationRequest {
+  uint64 id = 1;
+}
+
+message PinLocationRequest {
+  uint64 user_id = 1;
+  uint64 location_id = 2;
+}
+
+message SearchLocationResponse {
+  repeated Location locations = 1;
+}
+
+service LocationService {
+  rpc search(SearchLocationRequest) returns (SearchLocationResponse);
+  rpc get(GetLocationRequest) returns (LocationResponse);
+  rpc pin(PinLocationRequest) returns (ApiResponse);
+}
