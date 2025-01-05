@@ -1,45 +1,63 @@
 package com.example.apigateway.Configuration;
 
-import com.example.apigateway.Clients.Client;
+import com.example.apigateway.Client;
+import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import com.example.apigateway.Clients.*;
 
 import java.lang.reflect.Method;
+import java.util.Set;
+
 
 @Configuration
-public class GrpcClientInitializer implements BeanPostProcessor {
+public class GrpcClientInitializer {
 
-    private String defaultHost;
+    private final Environment environment;
 
-    private int defaultPort;
+    public GrpcClientInitializer(Environment environment) {
+        this.environment = environment;
+        initializeClients();
+    }
 
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) {
-        Class<?> clazz = bean.getClass();
+    private void initializeClients() {
+        Reflections reflections = new Reflections(
+                new ConfigurationBuilder()
+                        .setUrls(ClasspathHelper
+                                .forPackage(UserClient.class.getPackageName())
+                        )
+        );
 
-        if (clazz.isAnnotationPresent(Client.class)) {
-            Client annotation = clazz.getAnnotation(Client.class);
-            String hostProperty = annotation.host();
-            String portProperty = annotation.port();
+        // Log all scanned classes
+
+        Set<Class<?>> allClasses = reflections.getTypesAnnotatedWith(Client.class);
+
+        for (Class<?> clientClass : allClasses) {
+            Client clientAnnotation = clientClass.getAnnotation(Client.class);
+
+            String host = environment.resolvePlaceholders(clientAnnotation.host());
+            int port = Integer.parseInt(environment.resolvePlaceholders(clientAnnotation.port()));
+
+
+            // Create a ManagedChannel
+            ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
+                    .usePlaintext()
+                    .build();
 
             try {
-                String host = System.getProperty(hostProperty, defaultHost);
-                int port = Integer.parseInt(System.getProperty(portProperty, String.valueOf(defaultPort)));
-
-                ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
-                        .usePlaintext()
-                        .build();
-
-                Method initMethod = clazz.getDeclaredMethod("init", ManagedChannel.class);
-                initMethod.invoke(null, channel);
-
+                // Reflect the init method and invoke it
+                Method initMethod = clientClass.getDeclaredMethod("init", Channel.class);
+                initMethod.invoke(null, channel); // Call the static init method
+                System.out.printf("Initialized client: %s with host: %s and port: %d%n", clientClass.getName(), host, port);
             } catch (Exception e) {
-                throw new RuntimeException("Failed to initialize gRPC client for " + clazz.getSimpleName(), e);
+                throw new RuntimeException("Failed to initialize client: " + clientClass.getName(), e);
             }
         }
-
-        return bean;
     }
 }
+

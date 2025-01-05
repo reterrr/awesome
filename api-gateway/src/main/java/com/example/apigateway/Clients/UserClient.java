@@ -1,9 +1,11 @@
 package com.example.apigateway.Clients;
 
+import com.example.apigateway.Client;
 import com.example.generated.*;
 import io.grpc.Channel;
 
-@Client(host = "${user.server.host}", port = "${user.server.port}")
+@Client(host = "${user.server.host}",
+        port = "${user.server.port}")
 public class UserClient {
     private static UserServiceGrpc.UserServiceBlockingStub stub;
 
@@ -37,7 +39,7 @@ public class UserClient {
         return stub.deleteUser(request);
     }
 
-    protected static void init(Channel channel) {
+    public static void init(Channel channel) {
         stub = UserServiceGrpc.newBlockingStub(channel);
     }
 }

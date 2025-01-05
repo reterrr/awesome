@@ -1,11 +1,8 @@
-package com.example.apigateway.Clients;
+package com.example.apigateway;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Client {
     String host() default "localhost";
