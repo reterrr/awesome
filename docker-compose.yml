@@ -4,59 +4,102 @@ services:
       context: ./user
       dockerfile: Dockerfile
     networks:
-      - user-postgres
+      - user-postgres-n
+      - awesome
     depends_on:
-      - postgres
+      - user-postgres
 
-  location:
-    build:
-      context: ./location
-      dockerfile: Dockerfile
-    networks:
-      - awesome
+#  location:
+#    build:
+#      context: ./location
+#      dockerfile: Dockerfile
+#    networks:
+#      - awesome
+#      - location-postgres
+#    depends_on:
+#      - location-postgres
+#
+#  weather:
+#    build:
+#      context: ./weather
+#      dockerfile: Dockerfile
+#    networks:
+#      - awesome
+#
+#  user-location:
+#    build:
+#      context: ./user-location
+#      dockerfile: Dockerfile
+#    networks:
+#      - awesome
+#      - user_location-postgres
+#    depends_on:
+#      - user_location-postgres
+#
+#  api-gateway:
+#    build:
+#      context: ./api-gateway
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8000:8080"
+#    networks:
+#      - awesome
 
-  weather:
-    build:
-      context: ./weather
-      dockerfile: Dockerfile
-    networks:
-      - awesome
-
-  user-location:
-    build:
-      context: ./user-location
-      dockerfile: Dockerfile
-    networks:
-      - awesome
-
-  api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8080"
-    networks:
-      - awesome
-
-  postgres:
+  user-postgres:
     image: postgres
-    container_name: "postgresql"
+    container_name: "user-postgres"
     ports:
-      - 5433:5432
+      - "5434:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=12345678
-    volumes:
-      - user_service:/var/lib/postgresql/data
+      - POSTGRES_DB=users
     networks:
-      - user-postgres
+      - user-postgres-n
+    volumes:
+      - user_service_postgres:/var/lib/postgresql/data
+
+  location-postgres:
+    image: postgres
+    container_name: "location-postgres"
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=locations
+    networks:
+      - location-postgres
+    volumes:
+      - location_service_postgres:/var/lib/postgresql/data
+
+  user_location-postgres:
+    image: postgres
+    container_name: "user_location-postgres"
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=user_locations
+    networks:
+      - user_location-postgres-n
+    volumes:
+      - user_location_service_postgres:/var/lib/postgresql/data
 
 volumes:
-  user_service:
+  user_service_postgres:
+
+  user_location_service_postgres:
+
+  location_service_postgres:
 
 networks:
-  user-postgres:
+  user-postgres-n:
+    driver: bridge
+  user_location-postgres-n:
+    driver: bridge
+  location-postgres-n:
     driver: bridge
   awesome:
     driver: bridge
-

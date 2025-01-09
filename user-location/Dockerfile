@@ -1,11 +1,5 @@
-FROM maven:latest as build
+FROM openjdk:17
 WORKDIR /app
-COPY pom.xml .
-COPY src .
-RUN mvn clean package -DskipTests
-
-FROM openjdk:latest
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
+COPY ./target/*.jar app.jar
+EXPOSE 9090
 ENTRYPOINT ["java", "-jar", "app.jar"]

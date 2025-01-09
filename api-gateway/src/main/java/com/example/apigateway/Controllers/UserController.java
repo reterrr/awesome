@@ -1,5 +1,6 @@
 package com.example.apigateway.Controllers;
 
+import com.example.apigateway.Helpers.SecurityUtil;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -12,13 +13,8 @@ public class UserController
 
     }
 
-    @DeleteMapping("/locations/{id}")
-    public void unpinLocation(@PathVariable String id) {
-
-    }
-
     @DeleteMapping("/")
     public void deleteUser() {
-
+        long id = Long.parseLong(SecurityUtil.getCurrentUserId());
     }
 }

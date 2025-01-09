@@ -10,6 +10,11 @@ public class LocationController {
 
     }
 
+    @GetMapping("/{id}")
+    public void get() {
+
+    }
+
     @PostMapping("/{id}")
     public void pin(@PathVariable String id) {
 

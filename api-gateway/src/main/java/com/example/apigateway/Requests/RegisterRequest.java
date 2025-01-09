@@ -13,8 +13,6 @@ public class RegisterRequest {
 
     private String password;
 
-    private String confirmPassword;
-
     @NotEmpty
     private String name;
 }
