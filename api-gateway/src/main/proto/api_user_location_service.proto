@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.example.generated;
+option java_package = "com.example.generated";
+option java_multiple_files = true;
+
+message PinLocationRequest {
+  int64 user_id = 1;
+  int64 location_id = 2;
+}
+
+message UnPinLocationRequest {
+  int64 user_id = 1;
+  int64 location_id = 2;
+}

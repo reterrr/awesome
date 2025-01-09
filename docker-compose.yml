@@ -1,12 +1,13 @@
 services:
-#  user:
-#    build:
-#      context: ./user
-#      dockerfile: Dockerfile
-#    networks:
-#      - user-postgres
-#    depends_on:
-#      - postgres
+  user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    networks:
+      - user-postgres-n
+      - awesome
+    depends_on:
+      - user-postgres
 
 #  location:
 #    build:
@@ -14,22 +15,16 @@ services:
 #      dockerfile: Dockerfile
 #    networks:
 #      - awesome
+#      - location-postgres
 #    depends_on:
-#      - rabbitmq
-
-  weather:
-    build:
-      context: ./weather
-      dockerfile: Dockerfile
-    ports:
-      - "9090:9090"
-    networks:
-      - awesome
-    depends_on:
-      - redis
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+#      - location-postgres
+#
+#  weather:
+#    build:
+#      context: ./weather
+#      dockerfile: Dockerfile
+#    networks:
+#      - awesome
 #
 #  user-location:
 #    build:
@@ -37,6 +32,9 @@ services:
 #      dockerfile: Dockerfile
 #    networks:
 #      - awesome
+#      - user_location-postgres
+#    depends_on:
+#      - user_location-postgres
 #
 #  api-gateway:
 #    build:
@@ -46,51 +44,62 @@ services:
 #      - "8000:8080"
 #    networks:
 #      - awesome
-#
-#  postgres:
-#    image: postgres
-#    container_name: "postgresql"
-#    ports:
-#      - 5433:5432
-#    environment:
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_PASSWORD=12345678
-#    volumes:
-#      - user_service:/var/lib/postgresql/data
-#    networks:
-#      - user-postgres
 
-#
-#  rabbitmq:
-#    image: rabbitmq:3-management
-#    container_name: rabbitmq
-#    ports:
-#      - 5672:5672
-#      - 15672:15672
-#    volumes:
-#      - rabbitmq_data:/var/lib/rabbitmq
-#    networks:
-#      - awesome
-
-  redis:
-    image: redis:latest
-    container_name: weather_redis
+  user-postgres:
+    image: postgres
+    container_name: "user-postgres"
     ports:
-      - "6379:6379"
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=users
     networks:
-      - awesome
+      - user-postgres-n
     volumes:
-      - redis-data:/data
-    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+      - user_service_postgres:/var/lib/postgresql/data
 
+  location-postgres:
+    image: postgres
+    container_name: "location-postgres"
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=locations
+    networks:
+      - location-postgres
+    volumes:
+      - location_service_postgres:/var/lib/postgresql/data
+
+  user_location-postgres:
+    image: postgres
+    container_name: "user_location-postgres"
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=user_locations
+    networks:
+      - user_location-postgres-n
+    volumes:
+      - user_location_service_postgres:/var/lib/postgresql/data
 
 volumes:
-  user_service:
-  redis-data:
+  user_service_postgres:
+
+  user_location_service_postgres:
+
+  location_service_postgres:
 
 networks:
-  user-postgres:
+  user-postgres-n:
+    driver: bridge
+  user_location-postgres-n:
+    driver: bridge
+  location-postgres-n:
     driver: bridge
   awesome:
     driver: bridge
-

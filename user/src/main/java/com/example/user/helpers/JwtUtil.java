@@ -1,4 +1,5 @@
 package com.example.user.helpers;
+
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -21,35 +22,25 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.duration}")
+    private long duration;
+
     public String generateJWT(String userId) {
 
-        // Create claims for the JWT token
-        JwtClaimsSet claims = JwtClaimsSet.builder()// Issuer of the token// The time the token was issued
-                .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS)) // Expiry time of the token
-                .claim("sub", userId) // You can add custom claims if necessary
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .expiresAt(Instant.now().plus(duration, ChronoUnit.SECONDS))
+                .claim("sub", userId)
                 .build();
 
-        System.out.println(claims.getClaims());
         JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS512).build();
 
-        // Define the secret key for signing the JWT token
         SecretKey key = new SecretKeySpec(secret.getBytes(), SignatureAlgorithm.HS512.getJcaName());
         JWKSource<SecurityContext> jwkSource = new ImmutableSecret<>(key);
 
-        // Initialize the JWT encoder with the signing key
         JwtEncoder encoder = new NimbusJwtEncoder(jwkSource);
 
-        // Create and return the encoded JWT token
         Jwt jwt = encoder.encode(JwtEncoderParameters.from(jwsHeader, claims));
 
         return jwt.getTokenValue();
-    }
-    public String extractUserId(String token) {
-        SecretKey key = new SecretKeySpec(secret.getBytes(), SignatureAlgorithm.HS512.getJcaName());
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
-
-        Jwt decodedJwt = jwtDecoder.decode(token);
-        return decodedJwt.getClaim("userId");
-
     }
 }

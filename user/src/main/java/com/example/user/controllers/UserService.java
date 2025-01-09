@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class UserService extends UserServiceGrpc.UserServiceImplBase {
 
@@ -87,35 +86,37 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             ApiResponse apiResponse = ApiResponse.newBuilder()
-                    .setCode(401)  // 401 Unauthorized
+                    .setCode(401)
                     .setMessage("User not found")
                     .build();
 
             LoginUserResponse loginUserResponse = LoginUserResponse.newBuilder().
                     setApiResponse(apiResponse).
                     build();
+
             responseObserver.onNext(loginUserResponse);
             responseObserver.onCompleted();
+
             return;
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             ApiResponse apiResponse = ApiResponse.newBuilder()
-                    .setCode(401)  // 401 Unauthorized
+                    .setCode(401)
                     .setMessage("Password does not match")
                     .build();
 
             LoginUserResponse loginUserResponse = LoginUserResponse.newBuilder().
                     setApiResponse(apiResponse).
                     build();
+
             responseObserver.onNext(loginUserResponse);
             responseObserver.onCompleted();
+
             return;
         }
 
         String token = jwtUtil.generateJWT(userRepository.getUserIdByEmail(email).toString());
-
-        jwtUtil.extractUserId(token);
 
         ApiResponse apiResponse = ApiResponse.newBuilder()
                 .setCode(200)
@@ -126,6 +127,7 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
                 .setToken(token)
                 .setApiResponse(apiResponse)
                 .build();
+
         responseObserver.onNext(loginUserResponse);
         responseObserver.onCompleted();
     }
@@ -141,8 +143,10 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
                     .setCode(401)
                     .setMessage("User not found")
                     .build();
+
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
             return;
         }
         userRepository.deleteById(id);
@@ -151,8 +155,8 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
                 .setCode(200)
                 .setMessage("User deleted")
                 .build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
-
     }
 }

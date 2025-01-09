@@ -9,7 +9,7 @@ import io.grpc.Channel;
 public class UserClient {
     private static UserServiceGrpc.UserServiceBlockingStub stub;
 
-    public static ApiResponse login(String email, String password) {
+    public static LoginUserResponse login(String email, String password) {
         LoginUserRequest request = LoginUserRequest
                 .newBuilder()
                 .setEmail(email)
@@ -30,7 +30,7 @@ public class UserClient {
         return stub.register(request);
     }
 
-    public static ApiResponse delete(long id) {
+    public static ApiResponse delete(int id) {
         DeleteUserRequest request = DeleteUserRequest
                 .newBuilder()
                 .setId(id)

@@ -1,11 +1,17 @@
 syntax = "proto3";
 
 package com.example.generated;
+option java_package = "com.example.generated";
 option java_multiple_files = true;
 
 message LoginUserRequest {
   string email = 1;
   string password = 2;
+}
+
+message LoginUserResponse {
+  string token = 1;
+  ApiResponse apiResponse = 2;
 }
 
 message RegisterUserRequest {
@@ -15,7 +21,7 @@ message RegisterUserRequest {
 }
 
 message DeleteUserRequest {
-  uint64 id = 1;
+  uint32 id = 1;
 }
 
 message ApiResponse {
@@ -24,7 +30,7 @@ message ApiResponse {
 }
 
 service UserService {
-  rpc login(LoginUserRequest) returns (ApiResponse);
+  rpc login(LoginUserRequest) returns (LoginUserResponse);
   rpc register(RegisterUserRequest) returns (ApiResponse);
   rpc deleteUser(DeleteUserRequest) returns (ApiResponse);
 }

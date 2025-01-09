@@ -9,10 +9,11 @@ message LoginUserRequest {
   string password = 2;
 }
 
-message LoginUserResponse{
+message LoginUserResponse {
   string token = 1;
   ApiResponse apiResponse = 2;
 }
+
 message RegisterUserRequest {
   string email = 1;
   string password = 2;
