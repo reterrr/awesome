@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package com.example.generated;
+option java_multiple_files = true;
+
+message CurrentWeatherRequest {
+  string city = 1;
+}
+
+message CurrentWeatherResponse {
+  CurrentWeather currentWeather = 1;
+  Wind wind = 2;
+  int32 humidity = 3;
+  int32 visibility = 4;
+  int32 sunrise = 5;
+  int32 sunset = 6;
+  int32 dt = 7;
+  string city_name = 8;
+  string country = 9;
+  int32 code = 10;
+}
+
+message CurrentWeather {
+  float temp = 1;
+  string description = 2;
+  string icon = 3;
+  float feels_like = 4;
+  float temp_min = 5;
+  float temp_max = 6;
+  string main = 7;
+}
+
+message Wind {
+  float speed = 1;
+  int32 deg = 2;
+  float gust = 3;
+}
+
+message HourlyWeatherRequest {
+  string city = 1;
+}
+
+message HourlyWeatherResponse {
+  repeated DailyWeather dailyWeather = 1;
+  string city_name = 2;
+  string country = 3;
+}
+
+message DailyWeather {
+  string date = 1;
+  repeated HourlyWeather hourlyWeather = 2;
+}
+
+message HourlyWeather {
+  int32 dt = 1;
+  Main main = 2;
+  WeatherDescription weather = 3;
+  Wind wind = 4;
+  float pop = 5;
+  Rain rain = 6;
+  Clouds clouds = 7;
+  string dt_txt = 8;
+  Sys sys = 9;
+  Snow snow = 10;
+}
+
+message Main {
+  float temp = 1;
+  float feels_like = 2;
+  float temp_min = 3;
+  float temp_max = 4;
+  int32 pressure = 5;
+  int32 humidity = 6;
+  float temp_kf = 7;
+  int32 sea_level = 8;
+  int32 grnd_level = 9;
+}
+
+message WeatherDescription {
+  int32 id = 1;
+  string main = 2;
+  string description = 3;
+  string icon = 4;
+}
+
+message Rain {
+  float rain = 1;
+}
+
+message Snow {
+  float snow = 1;
+}
+
+message Clouds {
+  int32 all = 1;
+}
+
+message Sys {
+  string pod = 1;
+}
+
+service WeatherService {
+  rpc getCurrentWeather(stream CurrentWeatherRequest) returns (stream CurrentWeatherResponse);
+  rpc getHourlyWeather(stream HourlyWeatherRequest) returns (stream HourlyWeatherResponse);
+}

@@ -79,6 +79,7 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
     public void login(LoginUserRequest request, StreamObserver<LoginUserResponse> responseObserver){
         String email = request.getEmail();
         String password = request.getPassword();
@@ -130,6 +131,7 @@ public class UserService extends UserServiceGrpc.UserServiceImplBase {
     }
 
     @Transactional
+    @Override
     public void deleteUser( DeleteUserRequest request, StreamObserver<ApiResponse> responseObserver){
         long id = request.getId();
 

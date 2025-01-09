@@ -1,58 +1,92 @@
 services:
-  user:
-    build:
-      context: ./user
-      dockerfile: Dockerfile
-    networks:
-      - user-postgres
-    depends_on:
-      - postgres
+#  user:
+#    build:
+#      context: ./user
+#      dockerfile: Dockerfile
+#    networks:
+#      - user-postgres
+#    depends_on:
+#      - postgres
 
-  location:
-    build:
-      context: ./location
-      dockerfile: Dockerfile
-    networks:
-      - awesome
+#  location:
+#    build:
+#      context: ./location
+#      dockerfile: Dockerfile
+#    networks:
+#      - awesome
+#    depends_on:
+#      - rabbitmq
 
   weather:
     build:
       context: ./weather
       dockerfile: Dockerfile
-    networks:
-      - awesome
-
-  user-location:
-    build:
-      context: ./user-location
-      dockerfile: Dockerfile
-    networks:
-      - awesome
-
-  api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
     ports:
-      - "8000:8080"
+      - "9090:9090"
     networks:
       - awesome
-
-  postgres:
-    image: postgres
-    container_name: "postgresql"
-    ports:
-      - 5433:5432
+    depends_on:
+      - redis
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=12345678
-    volumes:
-      - user_service:/var/lib/postgresql/data
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+#
+#  user-location:
+#    build:
+#      context: ./user-location
+#      dockerfile: Dockerfile
+#    networks:
+#      - awesome
+#
+#  api-gateway:
+#    build:
+#      context: ./api-gateway
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8000:8080"
+#    networks:
+#      - awesome
+#
+#  postgres:
+#    image: postgres
+#    container_name: "postgresql"
+#    ports:
+#      - 5433:5432
+#    environment:
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=12345678
+#    volumes:
+#      - user_service:/var/lib/postgresql/data
+#    networks:
+#      - user-postgres
+
+#
+#  rabbitmq:
+#    image: rabbitmq:3-management
+#    container_name: rabbitmq
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+#    volumes:
+#      - rabbitmq_data:/var/lib/rabbitmq
+#    networks:
+#      - awesome
+
+  redis:
+    image: redis:latest
+    container_name: weather_redis
+    ports:
+      - "6379:6379"
     networks:
-      - user-postgres
+      - awesome
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+
 
 volumes:
   user_service:
+  redis-data:
 
 networks:
   user-postgres:
