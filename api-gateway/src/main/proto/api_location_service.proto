@@ -23,10 +23,6 @@ message GetLocationRequest {
   uint64 id = 1;
 }
 
-message PinLocationRequest {
-  uint64 user_id = 1;
-  uint64 location_id = 2;
-}
 
 message SearchLocationResponse {
   repeated Location locations = 1;
@@ -35,5 +31,5 @@ message SearchLocationResponse {
 service LocationService {
   rpc search(SearchLocationRequest) returns (SearchLocationResponse);
   rpc get(GetLocationRequest) returns (LocationResponse);
-  rpc pin(PinLocationRequest) returns (ApiResponse);
+  //rpc pin(PinLocationRequest) returns (ApiResponse);
 }

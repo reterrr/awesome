@@ -3,4 +3,6 @@ syntax = "proto3";
 package com.example.generated;
 option java_multiple_files = true;
 
-import "api_location_service.proto";
+message SomeMessage {
+
+}

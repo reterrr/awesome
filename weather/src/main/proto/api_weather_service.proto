@@ -12,9 +12,9 @@ message CurrentWeatherResponse {
   Wind wind = 2;
   int32 humidity = 3;
   int32 visibility = 4;
-  int32 sunrise = 5;
-  int32 sunset = 6;
-  int32 dt = 7;
+  string sunrise = 5;
+  string sunset = 6;
+  string dt = 7;
   string city_name = 8;
   string country = 9;
   int32 code = 10;
@@ -52,16 +52,57 @@ message DailyWeather {
 }
 
 message HourlyWeather {
-  int32 dt = 1;
+  string dt = 1;
   Main main = 2;
   WeatherDescription weather = 3;
   Wind wind = 4;
   float pop = 5;
   Rain rain = 6;
   Clouds clouds = 7;
-  string dt_txt = 8;
-  Sys sys = 9;
-  Snow snow = 10;
+  Sys sys = 8;
+  Snow snow = 9;
+}
+
+message ForecastRequest {
+  string city = 1;
+}
+
+message ForecastResponse {
+  string city = 1;
+  string country = 2;
+  repeated ForecastDay list = 3;
+}
+
+message ForecastDay {
+  string dt = 1;
+  string sunrise = 2;
+  string sunset = 3;
+  Temp temp = 4;
+  FeelsLike feels_like = 5;
+  int32 pressure = 6;
+  int32 humidity = 7;
+  repeated WeatherDescription weather = 8;
+  int32 clouds = 10;
+  float rain = 11;
+  float snow = 12;
+}
+
+
+
+message Temp {
+  float day = 1;
+  float min = 2;
+  float max = 3;
+  float night = 4;
+  float eve = 5;
+  float morn = 6;
+}
+
+message FeelsLike {
+  float day = 1;
+  float night = 2;
+  float eve = 3;
+  float morn = 4;
 }
 
 message Main {
@@ -102,4 +143,5 @@ message Sys {
 service WeatherService {
   rpc getCurrentWeather(stream CurrentWeatherRequest) returns (stream CurrentWeatherResponse);
   rpc getHourlyWeather(stream HourlyWeatherRequest) returns (stream HourlyWeatherResponse);
+  rpc getForecastWeather(stream ForecastRequest) returns (stream ForecastResponse);
 }

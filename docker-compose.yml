@@ -3,9 +3,12 @@ services:
     build:
       context: ./user
       dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
     networks:
       - user-postgres-n
       - awesome
+
     depends_on:
       - user-postgres
 
@@ -23,6 +26,8 @@ services:
     build:
       context: ./weather
       dockerfile: Dockerfile
+    ports:
+      - "9091:9090"
     networks:
       - awesome
     depends_on:
@@ -40,15 +45,15 @@ services:
 #      - user_location-postgres
 #    depends_on:
 #      - user_location-postgres
-#
-#  api-gateway:
-#    build:
-#      context: ./api-gateway
-#      dockerfile: Dockerfile
-#    ports:
-#      - "8000:8080"
-#    networks:
-#      - awesome
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8080"
+    networks:
+      - awesome
 
   user-postgres:
     image: postgres
