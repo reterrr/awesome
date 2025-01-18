@@ -1,0 +1,3 @@
+[submodule "location"]
+	path = location
+	url = git@github.com:reterrr/location_service.git

@@ -1,35 +1,37 @@
 services:
-  user:
+#  user:
+#    build:
+#      context: ./user
+#      dockerfile: Dockerfile
+#    networks:
+#      - user-postgres-n
+#      - awesome
+#    depends_on:
+#      - user-postgres
+
+  location:
     build:
-      context: ./user
+      context: ./location
       dockerfile: Dockerfile
     networks:
-      - user-postgres-n
       - awesome
+      - location-postgres-n
+    ports:
+      - "9090:9090"
     depends_on:
-      - user-postgres
-
-#  location:
+      - location-postgres
+#
+#  weather:
 #    build:
-#      context: ./location
+#      context: ./weather
 #      dockerfile: Dockerfile
 #    networks:
 #      - awesome
-#      - location-postgres
 #    depends_on:
-#      - location-postgres
-#
-  weather:
-    build:
-      context: ./weather
-      dockerfile: Dockerfile
-    networks:
-      - awesome
-    depends_on:
-      - redis
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+#      - redis
+#    environment:
+#      REDIS_HOST: redis
+#      REDIS_PORT: 6379
 #
 #  user-location:
 #    build:

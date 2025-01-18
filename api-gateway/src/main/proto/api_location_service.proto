@@ -32,8 +32,17 @@ message SearchLocationResponse {
   repeated Location locations = 1;
 }
 
+message GetLocationsRequest {
+  repeated int64 ids = 1;
+}
+
+message GetLocationsResponse {
+  repeated Location locations = 1;
+}
+
 service LocationService {
   rpc search(SearchLocationRequest) returns (SearchLocationResponse);
   rpc get(GetLocationRequest) returns (LocationResponse);
   rpc pin(PinLocationRequest) returns (ApiResponse);
+  rpc getFew(GetLocationsRequest) returns (GetLocationsRequest);
 }
