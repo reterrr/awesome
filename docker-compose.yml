@@ -9,16 +9,16 @@ services:
     depends_on:
       - user-postgres
 
-#  location:
-#    build:
-#      context: ./location
-#      dockerfile: Dockerfile
-#    networks:
-#      - awesome
-#      - location-postgres
-#    depends_on:
-#      - location-postgres
-#
+  location:
+    build:
+      context: ./location
+      dockerfile: Dockerfile
+    networks:
+      - awesome
+      - location-postgres-n
+    depends_on:
+      - location-postgres
+
   weather:
     build:
       context: ./weather
@@ -30,16 +30,16 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-#
-#  user-location:
-#    build:
-#      context: ./user-location
-#      dockerfile: Dockerfile
-#    networks:
-#      - awesome
-#      - user_location-postgres
-#    depends_on:
-#      - user_location-postgres
+
+  user-location:
+    build:
+      context: ./user-location
+      dockerfile: Dockerfile
+    networks:
+      - awesome
+      - user_location-postgres-n
+    depends_on:
+      - user_location-postgres
 
   api-gateway:
     build:

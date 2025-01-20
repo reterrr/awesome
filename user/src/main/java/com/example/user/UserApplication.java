@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class UserApplication{
+public class UserApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);
@@ -17,5 +17,4 @@ public class UserApplication{
     public CommandLineRunner startGrpcServer(GrpcServer grpcServer) {
         return args -> grpcServer.start();
     }
-
 }
