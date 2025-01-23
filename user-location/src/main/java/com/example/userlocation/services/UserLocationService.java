@@ -1,6 +1,9 @@
 package com.example.userlocation.services;
 
 import com.example.generated.*;
+import com.example.userlocation.clients.LocationClient;
+import com.example.userlocation.clients.WeatherClient;
+import com.example.userlocation.dbevents.*;
 import com.example.userlocation.domain.UserLocation;
 import com.example.userlocation.domain.UserLocationId;
 import com.example.userlocation.repositories.UserLocationRepository;
@@ -20,6 +23,10 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
         this.userLocationRepository = userLocationRepository;
     }
 
+    @Event(slug = "pin",
+            type = DbEventType.POST,
+            signaller = UnPinSignaller.class
+    )
     @Override
     public void pin(PinRequest request, StreamObserver<PinResponse> responseObserver) {
         var userId = request.getUserId();
@@ -38,6 +45,13 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
 
         userLocationRepository.save(userLocation);
 
+        Iterable<Long> locationIds = userLocationRepository.findAllDistinctLocationIds();
+
+        WeatherClient.updateLocations(LocationClient.getLocations(locationIds));
+
+//        UnPinSignaller signaller = new UnPinSignaller();
+//        signaller.on();
+
         var result = PinResponse
                 .newBuilder()
                 .setMessage("Success")
@@ -47,6 +61,10 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
         responseObserver.onCompleted();
     }
 
+    @Event(slug = "unpin",
+            type = DbEventType.DELETE,
+            signaller = UnPinSignaller.class
+    )
     @Override
     public void unpin(UnpinRequest request, StreamObserver<UnPinResponse> responseObserver) {
         var userId = request.getUserId();
@@ -58,7 +76,15 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
                 .user_id(userId)
                 .build();
 
+//        UnPinSignaller signaller = new UnPinSignaller();
+//        signaller.on();
+
         userLocationRepository.deleteById(userLocationId);
+
+        Iterable<Long> locationIds = userLocationRepository.findAllDistinctLocationIds();
+        locationIds.forEach(System.out::println);
+
+        WeatherClient.updateLocations(LocationClient.getLocations(locationIds));
 
         var result = UnPinResponse
                 .newBuilder()

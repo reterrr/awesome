@@ -1,0 +1,13 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+package com.example.generated;
+option java_multiple_files = true;
+
+message efefefe {
+  repeated string names = 1;
+}
+
+service Retererer {
+  rpc updateLocations(efefefe) returns (google.protobuf.Empty);
+}

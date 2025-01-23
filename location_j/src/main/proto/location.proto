@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package com.example.generated;
+option java_package = "com.example.generated";
+option java_multiple_files = true;
+
+message Location {
+    uint64 id = 1;
+    string name = 2;
+    string country = 3;
+    double longitude = 4;
+    double latitude = 5;
+}
+
+message SearchLocationRequest {
+    string pattern_name = 1;
+    string pattern_country = 2;
+    double pattern_longitude = 3;
+    double pattern_latitude = 4;
+}
+
+message GetLocationRequest {
+    uint32 id = 1;
+}
+
+message GetLocationResponse {
+    Location location = 1;
+}
+
+message GetLocationsRequest {
+    repeated uint64 ids = 1;
+}
+
+message LocationsResponse {
+    repeated Location locations = 1;
+}
+
+service LocationService {
+    rpc search (stream SearchLocationRequest) returns (stream LocationsResponse);
+
+    rpc get (GetLocationRequest) returns (GetLocationResponse);
+
+    rpc getLocations (GetLocationsRequest) returns (LocationsResponse);
+}

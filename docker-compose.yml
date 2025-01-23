@@ -11,8 +11,10 @@ services:
 
   location:
     build:
-      context: ./location
+      context: ./location_j
       dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
     networks:
       - awesome
       - location-postgres-n
@@ -37,11 +39,14 @@ services:
     build:
       context: ./user-location
       dockerfile: Dockerfile
+    ports:
+      - "9091:9090"
     networks:
       - awesome
       - user_location-postgres-n
     depends_on:
       - user_location-postgres
+      - location
 
   api-gateway:
     build:
@@ -77,6 +82,7 @@ services:
       - POSTGRES_DB=locations
     networks:
       - location-postgres-n
+      - awesome
     volumes:
       - location_service_postgres:/var/lib/postgresql/data
 

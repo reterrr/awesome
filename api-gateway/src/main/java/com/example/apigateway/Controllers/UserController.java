@@ -16,6 +16,6 @@ public class UserController
 
     @DeleteMapping("/")
     public void deleteUser() {
-        long id = Long.parseLong(SecurityUtil.getCurrentUserId());
+
     }
 }
