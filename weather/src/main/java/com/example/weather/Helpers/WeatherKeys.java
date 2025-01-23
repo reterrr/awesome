@@ -1,9 +1,9 @@
 package com.example.weather.Helpers;
 
 public enum WeatherKeys{
-    WEATHER("weather : "),
-    HOURLY("hourly : "),
-    DAILY("daily : ");
+    WEATHER("weather:"),
+    HOURLY("hourly:"),
+    DAILY("daily:");
 
     private final String label;
 

@@ -1,5 +1,6 @@
 package com.example.apigateway.Controllers;
 
+import com.example.apigateway.Clients.WeatherClient;
 import com.example.apigateway.Helpers.SecurityUtil;
 import org.springframework.web.bind.annotation.*;
 

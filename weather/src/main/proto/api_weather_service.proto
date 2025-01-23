@@ -1,5 +1,5 @@
 syntax = "proto3";
-
+import "google/protobuf/empty.proto";
 package com.example.generated;
 option java_multiple_files = true;
 
@@ -140,8 +140,15 @@ message Sys {
   string pod = 1;
 }
 
+message UpdateLocationsRequest{
+  repeated string names = 1;
+}
+
 service WeatherService {
   rpc getCurrentWeather(stream CurrentWeatherRequest) returns (stream CurrentWeatherResponse);
   rpc getHourlyWeather(stream HourlyWeatherRequest) returns (stream HourlyWeatherResponse);
   rpc getForecastWeather(stream ForecastRequest) returns (stream ForecastResponse);
+
+
+  rpc updateLocations(UpdateLocationsRequest) returns (google.protobuf.Empty);
 }
