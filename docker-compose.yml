@@ -3,6 +3,8 @@ services:
     build:
       context: ./user
       dockerfile: Dockerfile
+    ports:
+      - "9093:9090"
     networks:
       - user-postgres-n
       - awesome
