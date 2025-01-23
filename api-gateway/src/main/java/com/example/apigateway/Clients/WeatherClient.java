@@ -152,6 +152,4 @@ public class WeatherClient {
     public static void init(Channel channel) {
         stub = WeatherServiceGrpc.newStub(channel);
     }
-
-
 }

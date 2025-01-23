@@ -30,7 +30,7 @@ services:
     depends_on:
       - redis
     ports:
-      - "9090:9090"
+      - "9092:9090"
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379

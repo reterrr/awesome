@@ -16,12 +16,17 @@ import java.util.List;
 @RequestMapping("/weather")
 public class WeatherController {
 
-@GetMapping(value = "/current")
-    public WeatherResponse getCurrentWeather(@RequestParam @NotBlank String city_name) {
+@GetMapping(value = "/{city_name}")
+    public WeatherResponse getCurrentWeather(@PathVariable @NotBlank String city_name) {
         try{
 
             var weatherData = WeatherClient.getCurrentWeather(city_name);
             WeatherResponse response = new WeatherResponse();
+
+            if (weatherData.getCityName() == null) {
+                return new WeatherResponse();
+            }
+
             WeatherResponse.CurrentWeather currentWeather = new WeatherResponse.CurrentWeather();
             currentWeather.setDescription(weatherData.getCurrentWeather().getDescription());
             currentWeather.setIcon(weatherData.getCurrentWeather().getIcon());
@@ -61,6 +66,10 @@ public class WeatherController {
         try {
             var hourlyWeatherData = WeatherClient.getHourlyWeather(city_name);
             HourlyResponse response = new HourlyResponse();
+
+            if (response.getCityName() == null) {
+                return new HourlyResponse();
+            }
 
             response.setCityName(hourlyWeatherData.getCityName());
             response.setCountry(hourlyWeatherData.getCountry());
@@ -143,6 +152,10 @@ public class WeatherController {
         try {
             var forecastData = WeatherClient.getForecastWeather(city_name);
             ForecastWeatherResponse response = new ForecastWeatherResponse();
+
+            if (response.getCity() == null) {
+                return new ForecastWeatherResponse();
+            }
 
             response.setCity(forecastData.getCity());
             response.setCountry(forecastData.getCountry());
