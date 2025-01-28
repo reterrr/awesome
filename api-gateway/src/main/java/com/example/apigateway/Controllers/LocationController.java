@@ -1,7 +1,9 @@
 package com.example.apigateway.Controllers;
 
 import com.example.apigateway.Clients.LocationClient;
+import com.example.apigateway.Clients.UserLocationClient;
 import com.example.apigateway.Helpers.SecurityUtil;
+import com.example.apigateway.Responses.Response;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
 public class LocationController {
     @GetMapping("/search")
     public void search() {
-        //
+        //TODO
     }
 
     @GetMapping("/{id}")
@@ -25,12 +27,16 @@ public class LocationController {
     }
 
     @PostMapping("/{id}")
-    public void pin(@PathVariable String id) {
-        //
+    public Response<Void> pin(@PathVariable long id) {
+        var response = UserLocationClient.pin(Long.parseLong(SecurityUtil.getCurrentUserId()), id);
+
+        var message = response.getMessage();
+
+        return new Response<>(200, message);
     }
 
     @DeleteMapping("/{id}")
-    public void unpin(@PathVariable String id) {
-        //
+    public void unpin(@PathVariable long id) {
+        //TODO
     }
 }
