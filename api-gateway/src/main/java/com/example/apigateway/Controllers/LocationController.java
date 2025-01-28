@@ -32,11 +32,21 @@ public class LocationController {
 
         var message = response.getMessage();
 
-        return new Response<>(200, message);
+        return new Response<>(
+                200,
+                message
+        );
     }
 
     @DeleteMapping("/{id}")
-    public void unpin(@PathVariable long id) {
-        //TODO
+    public Response<Void> unpin(@PathVariable long id) {
+        var response = UserLocationClient.unpin(Long.parseLong(SecurityUtil.getCurrentUserId()), id);
+
+        var message = response.getMessage();
+
+        return new Response<>(
+                200,
+                message
+        );
     }
 }
