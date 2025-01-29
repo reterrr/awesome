@@ -4,6 +4,7 @@ import com.example.generated.*;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import io.grpc.stub.*;
@@ -48,6 +49,33 @@ public class LocationService extends LocationServiceGrpc.LocationServiceImplBase
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void exists(ExistsLocationRequest request, StreamObserver<ExistsLocationResponse> responseObserver) {
+        long id = request.getId();
+
+        String query = "SELECT EXISTS(SELECT 1 FROM cities WHERE id = ?)";
+
+        try {
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(query, id);
+
+            boolean exists = false;
+            if (!result.isEmpty()) {
+                Map<String, Object> row = result.get(0);
+                exists = (Boolean) row.get("exists");
+            }
+
+            ExistsLocationResponse response = ExistsLocationResponse.newBuilder()
+                    .setExists(exists)
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (DataAccessException e) {
+            responseObserver.onError(Status.INTERNAL.withDescription("Database error").withCause(e).asRuntimeException());
+        }
+    }
+
 
     @Override
     public void getLocations(GetLocationsRequest request, StreamObserver<LocationsResponse> responseObserver) {
@@ -97,7 +125,7 @@ public class LocationService extends LocationServiceGrpc.LocationServiceImplBase
             @Override
             public void onNext(SearchLocationRequest request) {
                 try {
-                    // Build the SQL query
+
                     SearchLocationQueryBuilder queryBuilder = new SearchLocationQueryBuilder();
                     String query = queryBuilder.build(
                             request.getPatternName(),
@@ -105,10 +133,10 @@ public class LocationService extends LocationServiceGrpc.LocationServiceImplBase
                             request.getPatternLatitude(),
                             request.getPatternLongitude());
 
-                    // Execute the query and fetch results
+
                     List<Location> locations = executeSearchQuery(query);
 
-                    // Send the results via responseObserver
+
                     for (Location location : locations) {
                         Location l = Location.newBuilder()
                                 .setId(location.getId())
@@ -127,23 +155,23 @@ public class LocationService extends LocationServiceGrpc.LocationServiceImplBase
                         responseObserver.onNext(response);
                     }
 
-                    // Indicate the end of the stream
+
                     responseObserver.onCompleted();
 
                 } catch (Exception e) {
-                    // Handle exceptions, e.g., query execution failure
+
                     responseObserver.onError(e);
                 }
             }
 
             @Override
             public void onError(Throwable t) {
-                // Handle any errors that occur during streaming
+
             }
 
             @Override
             public void onCompleted() {
-                // This is where you can finalize anything after the request is completed
+
             }
         };
     }
