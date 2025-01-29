@@ -53,6 +53,7 @@ public class WeatherApiHelper{
             JSONObject jsonObject = new JSONObject(response.body().string());
             CurrentWeatherResponse.Builder responseBuilder = weatherParse.parseWeatherResponse(jsonObject);
 
+
             redisTemplate.opsForValue().set(cacheKey, jsonObject.toString(), 90, TimeUnit.MINUTES);
 
             responseObserver.onNext(responseBuilder.build());
@@ -71,14 +72,6 @@ public class WeatherApiHelper{
             }
 
             JSONObject jsonObject = new JSONObject(response.body().string());
-
-            String cacheKey = "weather:" + city + ":persistent";
-            String newWeatherDataStr = jsonObject.toString();
-            String cachedWeatherData = redisTemplate.opsForValue().get(cacheKey);
-
-            System.out.println("Old Cache: " + cachedWeatherData);
-            System.out.println("New Data: " + newWeatherDataStr);
-
             return jsonObject.toString();
 
         } catch (IOException e) {
@@ -86,6 +79,8 @@ public class WeatherApiHelper{
             return null;
         }
     }
+
+
 
 
     public void fetchHourlyFromAPI(String city, StreamObserver<HourlyWeatherResponse> responseObserver, String cacheKey) {
@@ -124,7 +119,7 @@ public class WeatherApiHelper{
             JSONObject jsonObject = new JSONObject(response.body().string());
             ForecastResponse forecastResponse = weatherParse.parseForecastResponse(jsonObject);
 
-            redisTemplate.opsForValue().set(cacheKey, jsonObject.toString(), 5, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(cacheKey, jsonObject.toString(), 90, TimeUnit.MINUTES);
 
             responseObserver.onNext(forecastResponse);
         } catch (IOException e) {

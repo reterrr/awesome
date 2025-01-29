@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
@@ -96,36 +97,9 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
         };
     }
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 50000)
     public void fetchWeatherForPersistentCitiesCurrent() {
-        Set<String> keys = redisTemplate.keys("weather:*:persistent");
-
-        if (keys != null && !keys.isEmpty()) {
-            for (String key : keys) {
-                String cityName = key.split(":")[1];
-                System.out.println("Current weather data for " + cityName + " updated in Redis.");
-
-                String cacheKey = "weather:" + cityName + ":persistent";
-
-                String newWeatherData = weatherApiHelper.fetchWeather(cityName,weather_base_url);
-
-                if (newWeatherData != null) {
-
-                    String cachedWeatherData = redisTemplate.opsForValue().get(cacheKey);
-
-                    String newWeatherDataStr = newWeatherData;
-
-                    if (cachedWeatherData == null || !cachedWeatherData.equals(newWeatherDataStr)) {
-                        System.out.println("Updating weather data in Redis for " + cacheKey);
-                        redisTemplate.opsForValue().set(cacheKey, newWeatherDataStr);
-                    } else {
-                        System.out.println("Weather data for " + cityName + " has not changed, skipping Redis update.");
-                    }
-                } else {
-                    System.out.println("Failed to fetch weather data for " + cityName);
-                }
-            }
-        }
+        FetchAndUpdate("weather:*",weather_base_url,"weather:");
     }
 
     @Override
@@ -247,35 +221,7 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
 
     @Scheduled(fixedRate = 50000)
     public void fetchWeatherForPersistentCitiesDaily() {
-        Set<String> keys = redisTemplate.keys("daily:*:persistent");
-
-        if (keys != null && !keys.isEmpty()) {
-            for (String key : keys) {
-                String cityName = key.split(":")[1];
-                System.out.println("Daily weather data for " + cityName + " updated in Redis.");
-
-                String cacheKey = "daily:" + cityName + ":persistent";
-
-                String newWeatherData = weatherApiHelper.fetchWeather(cityName, daily_base_url);
-
-                if (newWeatherData != null) {
-
-                    String cachedWeatherData = redisTemplate.opsForValue().get(cacheKey);
-
-                    String newWeatherDataStr = newWeatherData;
-
-                    if (cachedWeatherData == null || !cachedWeatherData.equals(newWeatherDataStr)) {
-
-                        System.out.println("Updating weather data in Redis for " + cacheKey + ": " );
-                        redisTemplate.opsForValue().set(cacheKey, newWeatherDataStr);
-                    } else {
-                        System.out.println("Weather data for " + cityName + " has not changed, skipping Redis update." );
-                    }
-                } else {
-                    System.out.println("Failed to fetch weather data for " + cityName);
-                }
-            }
-        }
+        FetchAndUpdate("daily:*:persistent",daily_base_url,"daily:");
     }
 
     @Override
@@ -305,20 +251,67 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
                 }
 
                 String desiredStatus = CityNames.contains(cityName) ? "persistent" : "not_persistent";
-                if (currentStatus == null) {
-                    String newKey1 = type + ":" + cityName + ":" + desiredStatus;
-                    redisTemplate.rename(key, newKey1);
-                }
-                else if(!currentStatus.equals(desiredStatus)) {
+                if (currentStatus == null || !currentStatus.equals(desiredStatus)) {
                     String newKey = type + ":" + cityName + ":" + desiredStatus;
+
                     redisTemplate.rename(key, newKey);
+
+                    if (desiredStatus.equals("persistent")) {
+                        redisTemplate.persist(newKey);
+                    } else {
+                        redisTemplate.expire(newKey, 10, TimeUnit.MINUTES);
+                    }
                 }
             }
         responseObserver.onNext(com.google.protobuf.Empty.getDefaultInstance());
         responseObserver.onCompleted();
         }
     }
+
+    private void FetchAndUpdate(String redisKey, String url , String cacheKeyPrefix) {
+
+        Set<String> keys = redisTemplate.keys(redisKey);
+
+        if (keys != null && !keys.isEmpty()) {
+            for (String key : keys) {
+                String cityName = key.split(":")[1];
+                System.out.println("Weather data for " + cityName + " updated in Redis.");
+
+                String suffix = "";
+                if (key.endsWith(":persistent")) {
+                    suffix = ":persistent";
+                } else if (key.endsWith(":not_persistent")) {
+                    suffix = ":not_persistent";
+                }
+
+                String cacheKey = cacheKeyPrefix + cityName + suffix;
+
+                String newWeatherData = weatherApiHelper.fetchWeather(cityName, url);
+
+                if (newWeatherData != null) {
+                    String cachedWeatherData = redisTemplate.opsForValue().get(cacheKey);
+
+                    if (cachedWeatherData == null || !cachedWeatherData.equals(newWeatherData)) {
+                        System.out.println("Updating weather data in Redis for " + cacheKey);
+
+                        redisTemplate.opsForValue().set(cacheKey, newWeatherData);
+
+                        if (suffix.equals(":persistent")) {
+                            redisTemplate.persist(cacheKey);
+                        } else {
+                            redisTemplate.expire(cacheKey, 40, TimeUnit.MINUTES);
+                        }
+                    } else {
+                        System.out.println("Weather data for " + cityName + " has not changed, skipping Redis update.");
+                    }
+                } else {
+                    System.out.println("Failed to fetch weather data for " + cityName);
+                }
+            }
+        }
+    }
 }
+
 
 
 
