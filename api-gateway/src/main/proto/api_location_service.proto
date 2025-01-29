@@ -35,10 +35,20 @@ message LocationsResponse {
   repeated Location locations = 1;
 }
 
+message ExistsLocationRequest {
+  uint32 id = 1;
+}
+
+message ExistsLocationResponse {
+  bool exists = 1;
+}
+
 service LocationService {
   rpc search (stream SearchLocationRequest) returns (stream LocationsResponse);
 
   rpc get (GetLocationRequest) returns (GetLocationResponse);
 
   rpc getLocations (GetLocationsRequest) returns (LocationsResponse);
+
+  rpc exists(ExistsLocationRequest) returns(ExistsLocationResponse);
 }
