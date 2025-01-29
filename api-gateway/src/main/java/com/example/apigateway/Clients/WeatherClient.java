@@ -1,7 +1,6 @@
 package com.example.apigateway.Clients;
 
 import com.example.apigateway.Client;
-import com.example.apigateway.Responses.HourlyResponse;
 import com.example.generated.*;
 import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
@@ -24,7 +23,7 @@ public class WeatherClient {
                     @Override
                     public void onNext(CurrentWeatherResponse response) {
 
-                        System.out.println("Current weather response: " + response);
+                        //System.out.println("Current weather response: " + response);
                         currentWeatherResponse[0] = response;
                     }
 
@@ -36,7 +35,7 @@ public class WeatherClient {
 
                     @Override
                     public void onCompleted() {
-                        System.out.println("Weather data stream completed.");
+                        //System.out.println("Weather data stream completed.");
                         finishLatch.countDown();
                     }
                 };
@@ -69,7 +68,7 @@ public class WeatherClient {
                     @Override
                     public void onNext(HourlyWeatherResponse response) {
 
-                        System.out.println("Current weather response: " + response);
+                        //System.out.println("Current weather response: " + response);
                         hourlyWeatherResponse[0] = response;
                     }
 
@@ -81,7 +80,7 @@ public class WeatherClient {
 
                     @Override
                     public void onCompleted() {
-                        System.out.println("Weather data stream completed.");
+                        //System.out.println("Weather data stream completed.");
                         finishLatch.countDown();
                     }
                 };
@@ -114,7 +113,7 @@ public class WeatherClient {
                     @Override
                     public void onNext(ForecastResponse response) {
 
-                        System.out.println("Current weather response: " + response);
+                        //System.out.println("Current weather response: " + response);
                         forecastWeatherResponse[0] = response;
                     }
 
@@ -126,7 +125,7 @@ public class WeatherClient {
 
                     @Override
                     public void onCompleted() {
-                        System.out.println("Weather data stream completed.");
+                        //System.out.println("Weather data stream completed.");
                         finishLatch.countDown();
                     }
                 };

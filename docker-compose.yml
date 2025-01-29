@@ -8,8 +8,6 @@ services:
     networks:
       - user-postgres-n
       - awesome
-    ports:
-      - "9094:9090"
     depends_on:
       - user-postgres
 
