@@ -3,6 +3,7 @@ package com.example.apigateway.Controllers;
 import com.example.apigateway.Clients.LocationClient;
 import com.example.apigateway.Clients.UserLocationClient;
 import com.example.apigateway.Helpers.SecurityUtil;
+import com.example.apigateway.Requests.SearchRequest;
 import com.example.apigateway.Responses.Response;
 import com.example.apigateway.RestLocation;
 
@@ -18,18 +19,14 @@ import java.util.concurrent.Executors;
 @RequestMapping("/locations")
 public class LocationController {
     @GetMapping("/search-stream")
-    public SseEmitter searchStream(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "country", required = false) String country,
-            @RequestParam(value = "longitude", required = false) double longitude,
-            @RequestParam(value = "latitude", required = false) double latitude) {
+    public SseEmitter searchStream(@RequestBody SearchRequest request) {
 
-        SseEmitter emitter = new SseEmitter();
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
         executor.execute(() -> {
             try {
-                LocationClient.search(name, country, latitude, longitude, emitter);
+                LocationClient.search(request.getName(), request.getCountry(), request.getLatitude(), request.getLongitude(), emitter);
             } catch (Exception ex) {
                 emitter.completeWithError(ex);
             }

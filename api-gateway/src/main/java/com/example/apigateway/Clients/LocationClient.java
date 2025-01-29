@@ -81,7 +81,7 @@ public class LocationClient {
                                 .build())
                         .toList();
 
-                System.out.println("Found " + restLocations.size() + " rest locations");
+                System.out.println("Found " + restLocations.size() + " rest locations\n");
 
                 try {
                     emitter.send(SseEmitter.event()
@@ -104,12 +104,14 @@ public class LocationClient {
             }
         });
 
-        requestObserver.onNext(SearchLocationRequest.newBuilder()
-                .setPatternName(name)
-                .setPatternCountry(country)
-                .setPatternLatitude(latitude)
-                .setPatternLongitude(longitude)
-                .build());
+        requestObserver.onNext(
+                SearchLocationRequest.newBuilder()
+                        .setPatternName(name)
+                        .setPatternCountry(country)
+                        .setPatternLatitude(latitude)
+                        .setPatternLongitude(longitude)
+                        .build()
+        );
 
         requestObserver.onCompleted();
     }
