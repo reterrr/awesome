@@ -6,7 +6,10 @@ import com.example.userlocation.clients.WeatherClient;
 import com.example.userlocation.dbevents.*;
 import com.example.userlocation.domain.UserLocation;
 import com.example.userlocation.domain.UserLocationId;
+import com.example.userlocation.event.WeatherUpdateEventListener;
+import com.example.userlocation.event.WeatherUpdateEventPublisher;
 import com.example.userlocation.repositories.UserLocationRepository;
+import com.google.common.eventbus.EventBus;
 import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +20,13 @@ import java.util.List;
 public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
 
     private final UserLocationRepository userLocationRepository;
+    private final EventBus eventBus = new EventBus();
+    private final WeatherUpdateEventPublisher weatherUpdateEventPublisher = new WeatherUpdateEventPublisher(eventBus);
 
     @Autowired
     public UserLocationService(UserLocationRepository userLocationRepository) {
         this.userLocationRepository = userLocationRepository;
+        eventBus.register(new WeatherUpdateEventListener());
     }
 
     @Event(slug = "pin",
@@ -47,10 +53,7 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
 
         Iterable<Long> locationIds = userLocationRepository.findAllDistinctLocationIds();
 
-        WeatherClient.updateLocations(LocationClient.getLocations(locationIds));
-
-//        UnPinSignaller signaller = new UnPinSignaller();
-//        signaller.on();
+        weatherUpdateEventPublisher.publishWeatherUpdateEvent(locationIds);
 
         var result = PinResponse
                 .newBuilder()
@@ -76,15 +79,11 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
                 .user_id(userId)
                 .build();
 
-//        UnPinSignaller signaller = new UnPinSignaller();
-//        signaller.on();
-
         userLocationRepository.deleteById(userLocationId);
 
         Iterable<Long> locationIds = userLocationRepository.findAllDistinctLocationIds();
-        locationIds.forEach(System.out::println);
 
-        WeatherClient.updateLocations(LocationClient.getLocations(locationIds));
+        weatherUpdateEventPublisher.publishWeatherUpdateEvent(locationIds);
 
         var result = UnPinResponse
                 .newBuilder()
