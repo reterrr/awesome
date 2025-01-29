@@ -99,7 +99,7 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
 
     @Scheduled(fixedRate = 50000)
     public void fetchWeatherForPersistentCitiesCurrent() {
-        FetchAndUpdate("weather:*",weather_base_url,"weather:");
+        FetchAndUpdate("weather:*",weather_base_url);
     }
 
     @Override
@@ -147,35 +147,7 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
 
     @Scheduled(fixedRate = 50000)
     public void fetchWeatherForPersistentCitiesHourly() {
-        Set<String> keys = redisTemplate.keys("hourly:*:persistent");
-
-        if (keys != null && !keys.isEmpty()) {
-            for (String key : keys) {
-                String cityName = key.split(":")[1];
-                System.out.println("Hourly weather data for " + cityName + " updated in Redis.");
-
-                String cacheKey = "hourly:" + cityName + ":persistent";
-
-                String newWeatherData = weatherApiHelper.fetchWeather(cityName,hourly_base_url);
-
-                if (newWeatherData != null) {
-
-                    String cachedWeatherData = redisTemplate.opsForValue().get(cacheKey);
-
-                    String newWeatherDataStr = newWeatherData;
-
-                    if (cachedWeatherData == null || !cachedWeatherData.equals(newWeatherDataStr)) {
-
-                        System.out.println("Updating weather data in Redis for " + cacheKey + ": " );
-                        redisTemplate.opsForValue().set(cacheKey, newWeatherDataStr);
-                    } else {
-                        System.out.println("Weather data for " + cityName + " has not changed, skipping Redis update." );
-                    }
-                } else {
-                    System.out.println("Failed to fetch weather data for " + cityName);
-                }
-            }
-        }
+        FetchAndUpdate("hourly:*",hourly_base_url);
     }
 
     @Override
@@ -221,7 +193,7 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
 
     @Scheduled(fixedRate = 50000)
     public void fetchWeatherForPersistentCitiesDaily() {
-        FetchAndUpdate("daily:*:persistent",daily_base_url,"daily:");
+        FetchAndUpdate("daily:*",daily_base_url);
     }
 
     @Override
@@ -268,13 +240,18 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
         }
     }
 
-    private void FetchAndUpdate(String redisKey, String url , String cacheKeyPrefix) {
+    private void FetchAndUpdate(String redisKey, String url) {
 
         Set<String> keys = redisTemplate.keys(redisKey);
 
         if (keys != null && !keys.isEmpty()) {
             for (String key : keys) {
-                String cityName = key.split(":")[1];
+                String[] parts = key.split(":");
+                if (parts.length < 2) {
+                    continue;
+                }
+                String type = parts[0];
+                String cityName = parts[1];
                 System.out.println("Weather data for " + cityName + " updated in Redis.");
 
                 String suffix = "";
@@ -284,7 +261,7 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
                     suffix = ":not_persistent";
                 }
 
-                String cacheKey = cacheKeyPrefix + cityName + suffix;
+                String cacheKey = type + ":" + cityName + suffix;
 
                 String newWeatherData = weatherApiHelper.fetchWeather(cityName, url);
 
@@ -296,11 +273,6 @@ public class WeatherService extends WeatherServiceGrpc.WeatherServiceImplBase {
 
                         redisTemplate.opsForValue().set(cacheKey, newWeatherData);
 
-                        if (suffix.equals(":persistent")) {
-                            redisTemplate.persist(cacheKey);
-                        } else {
-                            redisTemplate.expire(cacheKey, 40, TimeUnit.MINUTES);
-                        }
                     } else {
                         System.out.println("Weather data for " + cityName + " has not changed, skipping Redis update.");
                     }
