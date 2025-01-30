@@ -43,7 +43,7 @@ public class LocationClient {
                 .getId();
     }
 
-    public static List<String> getLocations(Iterable<Long> ids) {
+    public static List<RestLocation> getLocations(Iterable<Long> ids) {
         var request = GetLocationsRequest
                 .newBuilder()
                 .addAllIds(ids)
@@ -52,7 +52,13 @@ public class LocationClient {
         return blockingStub.getLocations(request)
                 .getLocationsList()
                 .stream()
-                .map(Location::getName)
+                .map(loc -> RestLocation.builder()
+                        .id(loc.getId())
+                        .name(loc.getName())
+                        .country(loc.getCountry())
+                        .latitude(loc.getLatitude())
+                        .longitude(loc.getLongitude())
+                        .build())
                 .toList();
     }
 

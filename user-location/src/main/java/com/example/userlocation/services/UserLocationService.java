@@ -98,13 +98,11 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
     public void getRelatedLocations(GetRelatedLocationsRequest request, StreamObserver<GetRelatedLocationsResponse> responseObserver) {
         var userId = request.getUserId();
 
-        List<UserLocation> userLocations = userLocationRepository.findAll();
+        List<UserLocation> userLocations = userLocationRepository.findAllByUserId(userId);
         GetRelatedLocationsResponse.Builder response = GetRelatedLocationsResponse.newBuilder();
 
         for (UserLocation userLocation : userLocations) {
-            if (userLocation.getUserLocationId().getLocation_id() == userId) {
-                response.addLocations(userLocation.getUserLocationId().getLocation_id());
-            }
+            response.addLocations(userLocation.getUserLocationId().getLocation_id());
         }
 
         var result = response.build();
@@ -117,13 +115,11 @@ public class UserLocationService extends UserLocationGrpc.UserLocationImplBase {
     public void getRelatedUsers(GetRelatedUsersRequest request, StreamObserver<GetRelatedUsersResponse> responseObserver) {
         var locationId = request.getLocationId();
 
-        List<UserLocation> userLocations = userLocationRepository.findAll();
+        List<UserLocation> userLocations = userLocationRepository.findAllByLocationId(locationId);
         GetRelatedUsersResponse.Builder response = GetRelatedUsersResponse.newBuilder();
 
         for (UserLocation userLocation : userLocations) {
-            if (userLocation.getUserLocationId().getLocation_id() == locationId) {
-                response.addUsers(userLocation.getUserLocationId().getUser_id());
-            }
+            response.addUsers(userLocation.getUserLocationId().getUser_id());
         }
 
         var result = response.build();

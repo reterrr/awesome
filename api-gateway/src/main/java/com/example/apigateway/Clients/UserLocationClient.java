@@ -29,6 +29,15 @@ public class UserLocationClient {
         return blockingStub.unpin(unpinRequest);
     }
 
+    public static GetRelatedLocationsResponse getRelatedLocations(long userId) {
+        var getRelatedLocationsRequest = GetRelatedLocationsRequest
+                .newBuilder()
+                .setUserId(userId)
+                .build();
+
+        return blockingStub.getRelatedLocations(getRelatedLocationsRequest);
+    }
+
     public static void init(Channel channel) {
         blockingStub = UserLocationGrpc.newBlockingStub(channel);
     }

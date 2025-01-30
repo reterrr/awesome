@@ -10,7 +10,6 @@ import com.example.apigateway.RestLocation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +17,7 @@ import java.util.concurrent.Executors;
 @RestController
 @RequestMapping("/locations")
 public class LocationController {
-    @GetMapping("/search-stream")
+    @GetMapping("/search")
     public SseEmitter searchStream(@RequestBody SearchRequest request) {
 
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
@@ -44,7 +43,7 @@ public class LocationController {
     }
 
     @GetMapping("/gets")
-    public List<String> gets(@RequestBody List<Long> ids) {
+    public List<RestLocation> gets(@RequestBody List<Long> ids) {
         return LocationClient.getLocations(ids);
     }
 
